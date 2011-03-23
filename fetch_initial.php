@@ -8,6 +8,7 @@ try {
 	$q = filter_var($_GET["query"], FILTER_SANITIZE_URL);
 	$controller->fetch($ing, $q);
 	$controller->processData();
+	echo $controller->toXML();
 	
 	
 } catch (Exception $e) {

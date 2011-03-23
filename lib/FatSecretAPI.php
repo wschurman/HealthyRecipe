@@ -59,6 +59,7 @@ class FatSecretAPI{
 		$secret = $doc->auth_secret;
 	}
 	
+	
 	/* Get the auth details of a profile
 	* @param userID {string} Your ID for the profile
 	* @param token {string} The token for the profile is returned here
@@ -80,6 +81,23 @@ class FatSecretAPI{
 		
 		$token = $doc->auth_token;
 		$secret = $doc->auth_secret;
+	}
+	
+	function Search($search_term){
+		$url = FatSecretAPI::$base . "method=foods.search&search_expression=$search_term&format=xml&max_results=1";
+		
+		$oauth = new OAuthBase();
+		
+		$normalizedUrl;
+		$normalizedRequestParameters;
+		
+		$signature = $oauth->GenerateSignature($url, $this->_consumerKey, $this->_consumerSecret, null, null, $normalizedUrl, $normalizedRequestParameters);
+		
+		$doc = new SimpleXMLElement($this->GetQueryResponse($normalizedUrl, $normalizedRequestParameters . '&' . OAuthBase::$OAUTH_SIGNATURE . '=' . urlencode($signature)));
+		
+		$this->ErrorCheck($doc);
+		
+		return $doc;
 	}
 	
 	/* Create a new session for JavaScript API users

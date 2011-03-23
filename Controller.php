@@ -17,6 +17,7 @@ class Controller {
 		
 		$API = new FatSecretAPI(API_KEY, API_SECRET);
 		
+		return $API->Search($ingredient)->food->food_description;
 	}
 	
 	public function processData() {
@@ -30,14 +31,14 @@ class Controller {
 				$data = $this->getIngredientData($ingredient);
 				
 				$ingchild = $ingredientData->addChild("ingredient");
-				$ingchild->addChild("fat", $data["fat"]);
+				$ingchild->addChild("dat", $data);
 			}
 		}
 		
 	}
 	
 	public function toXML() {
-		return $responseXml->asXML();
+		return $this->responseXml->asXML();
 	}
 	
 }
