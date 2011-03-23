@@ -100,6 +100,23 @@ class FatSecretAPI{
 		return $doc;
 	}
 	
+	function getFood($id){
+		$url = FatSecretAPI::$base . "method=food.get&food_id=$id&format=xml";
+		
+		$oauth = new OAuthBase();
+		
+		$normalizedUrl;
+		$normalizedRequestParameters;
+		
+		$signature = $oauth->GenerateSignature($url, $this->_consumerKey, $this->_consumerSecret, null, null, $normalizedUrl, $normalizedRequestParameters);
+		
+		$doc = new SimpleXMLElement($this->GetQueryResponse($normalizedUrl, $normalizedRequestParameters . '&' . OAuthBase::$OAUTH_SIGNATURE . '=' . urlencode($signature)));
+		
+		$this->ErrorCheck($doc);
+		
+		return $doc;
+	}
+	
 	/* Create a new session for JavaScript API users
 	* @param auth {array} Pass user_id for your own ID or the token and secret for the profile. E.G.: array(user_id=>"user_id") or array(token=>"token", secret=>"secret")
 	* @param expires {int} The number of minutes before a session is expired after it is first started. Set this to 0 to never expire the session. (Set to any value less than 0 for default)
