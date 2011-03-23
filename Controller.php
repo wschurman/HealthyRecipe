@@ -5,6 +5,8 @@ require_once('lib/config.php');
 
 class Controller {
 	public $responseXml;
+	public $ingredientData = array();
+	public $ingredientMax = 0;
 	
 	public function fetch($ingredient, $query) {
 		$this->responseXml = simplexml_load_file("http://www.recipepuppy.com/api/?i=$ingredient&q=$query&p=1&format=xml");
@@ -12,25 +14,31 @@ class Controller {
 	
 	
 	public function getIngredientData($ingredient) {
-		//cache/memoize it
-		$data = array();
+		$this->ingredientMax++;
+		if($this->ingredientMax > 2 && !isset($this->ingredientData[$ingredient])) return array();
+		if(isset($this->ingredientData[$ingredient])) {
+			echo "found in cache<br />";
+			return $this->ingredientData[$ingredient];
+		}
 		
 		$API = new FatSecretAPI(API_KEY, API_SECRET);
-		
-		//$ing = $API->getFood($API->Search($ingredient)->food->food_id);
-		//echo $ing->asXML();
 		
 		$arr = preg_split("/[|-\s]+/", $API->Search($ingredient)->food->food_description);
 		$arr2 = array();
 		for($i = 2; $i < sizeof($arr); $i += 2) {
 			$arr2[strtolower(str_replace(":","",$arr[$i]))] = $arr[$i+1];
 		}
+		
+		$this->ingredientData[$ingredient] = $arr2;
+		
 		return $arr2;
 	}
 	
 	public function processData() {
-		
+		$j = 0;
 		foreach($this->responseXml->recipe as $recipe) {
+			$j++;
+			//if($j > 1) return;
 			$ingredients = explode(",", $recipe->ingredients);
 			
 			$ingredientData = $recipe->addChild("ingredientData");
