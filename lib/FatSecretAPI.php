@@ -83,8 +83,8 @@ class FatSecretAPI{
 		$secret = $doc->auth_secret;
 	}
 	
-	function Search($search_term){
-		$url = FatSecretAPI::$base . "method=foods.search&search_expression=$search_term&format=xml&max_results=1";
+	function runQuery($q){
+		$url = FatSecretAPI::$base . $q;
 		
 		$oauth = new OAuthBase();
 		
@@ -100,21 +100,12 @@ class FatSecretAPI{
 		return $doc;
 	}
 	
-	function getFood($id){
-		$url = FatSecretAPI::$base . "method=food.get&food_id=$id&format=xml";
-		
-		$oauth = new OAuthBase();
-		
-		$normalizedUrl;
-		$normalizedRequestParameters;
-		
-		$signature = $oauth->GenerateSignature($url, $this->_consumerKey, $this->_consumerSecret, null, null, $normalizedUrl, $normalizedRequestParameters);
-		
-		$doc = new SimpleXMLElement($this->GetQueryResponse($normalizedUrl, $normalizedRequestParameters . '&' . OAuthBase::$OAUTH_SIGNATURE . '=' . urlencode($signature)));
-		
-		$this->ErrorCheck($doc);
-		
-		return $doc;
+	public function getFood($id){
+		return $this->runQuery("method=food.get&food_id=$id&format=xml");
+	}
+	
+	public function Search($search_term){
+		return $this->runQuery("method=foods.search&search_expression=$search_term&format=xml&max_results=1");
 	}
 	
 	/* Create a new session for JavaScript API users

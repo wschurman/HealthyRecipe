@@ -4,9 +4,10 @@ try {
 	
 	require("Controller.php");
 	$controller = new Controller();
-	$ing = filter_var($_GET["ingredient"], FILTER_SANITIZE_URL);
+	//$ing = filter_var($_GET["ingredient"], FILTER_SANITIZE_URL);
 	$q = filter_var($_GET["query"], FILTER_SANITIZE_URL);
-	$controller->fetch($ing, $q);
+	$controller->fetch($q);
+	//$controller->processRecipes();
 	$controller->processData();
 	echo $controller->toXML();
 	
