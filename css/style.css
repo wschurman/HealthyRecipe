@@ -79,6 +79,7 @@ a:hover { color: #036; }
 body {
 	background:	#ddd;
 	background:url("../img/db.jpg") no-repeat top center;
+	background-attachment: fixed;
 }
 
 h2 {
@@ -136,6 +137,13 @@ form#getdata input:focus, form#getdata textarea:focus {
 	width:780px;
 	background:rgba(250,250,250,1);
 	display:none;
+}
+
+.recipe {
+	margin:10px 0;
+}
+.ingredient {
+	margin:5px 0;
 }
 
 

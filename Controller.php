@@ -42,6 +42,7 @@ class Controller {
 		foreach($this->responseXml->recipe as $recipe) {
 			
 			$ingredients = explode(",", $recipe->ingredients);
+			$recipe->addChild("name", $recipe->title[0]);
 			
 			$ingredientData = $recipe->addChild("ingredientData");
 			foreach($ingredients as $ingredient) {
