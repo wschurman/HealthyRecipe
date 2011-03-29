@@ -9,9 +9,10 @@ try {
 	$controller->fetch($q);
 	//$controller->processRecipes();
 	$controller->processData();
-	echo $controller->toXML();
-	
-	
+	$xml = $controller->toXML();
+	if($xml == "" || $xml == "User is performing too many actions: please try again later") throw new Exception("ahhh");
+	echo $xml;
+		
 } catch (Exception $e) {
 	header("HTTP/1.0 500 Internal Server Error");
 	echo $e->getMessage();

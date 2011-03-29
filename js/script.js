@@ -5,13 +5,14 @@ $(document).ready(function() {
 			
 			$("#returndata").fadeIn();
 			$("#getdata").hide();
+			$("h2").animate({marginTop:20}, 300);
 			
 			$(form).ajaxSubmit({
 				success : function(resp) {
 					parseXml(resp);
 				},
 				error: function(resp) {
-	                $("#returndata").html(resp);
+	                $("#returndata").html("There was an error with your request. This could be due to a high number of API calls. Please wait 30 seconds and try again.");
 	            }
 			});
 			return false;
