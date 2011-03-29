@@ -11,7 +11,9 @@ try {
 	$controller->processData();
 	$xml = $controller->toXML();
 	if($xml == "" || $xml == "User is performing too many actions: please try again later") throw new Exception("ahhh");
+	$controller->insertIntoExist();
 	echo $xml;
+	echo $controller->atom->asXML();
 		
 } catch (Exception $e) {
 	header("HTTP/1.0 500 Internal Server Error");
