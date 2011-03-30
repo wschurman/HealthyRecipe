@@ -21,6 +21,25 @@ class Controller {
 		$this->responseXml = simplexml_load_file("http://www.recipepuppy.com/api/?i=$ingredient&q=$query&p=1&format=xml");
 	}
 	
+	/* apparently this is used */
+	public function getIngredientData($ingredient) {
+			$this->ingredientMax++;
+			if($this->ingredientMax > 40 && !isset($this->ingredientData[$ingredient])) return array();
+			if(isset($this->ingredientData[$ingredient])) {
+				return $this->ingredientData[$ingredient];
+			}
+
+			$arr = preg_split("/[|-\s]+/", $this->API->Search($ingredient)->food->food_description);
+			$arr2 = array();
+			for($i = 2; $i < sizeof($arr); $i += 2) {
+				$arr2[strtolower(str_replace(":","",$arr[$i]))] = $arr[$i+1];
+			}
+			$arr2["amount"] = $arr[1];
+			$this->ingredientData[$ingredient] = $arr2;
+
+			return $arr2;
+		}
+	
 	/* called right after fetch to process the data. Simultaneously merges the xml sources (fatsecret, recipepuppy) and creates an atom compliant feed */
 	public function processData() {
 		$start = "<feed xmlns='http://www.w3.org/2005/Atom'></feed>";
