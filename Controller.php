@@ -15,32 +15,13 @@ class Controller {
 		 $this->API = new FatSecretAPI(API_KEY, API_SECRET);
 	}
 	
+	/* loads in initial recipe data from recipepuppy */
 	public function fetch($query) {
 		$this->query = $query;
-		//$this->responseXml = $this->API->runQuery("method=recipes.search&searh_expression=$query&format=xml&max_results=1");
 		$this->responseXml = simplexml_load_file("http://www.recipepuppy.com/api/?i=$ingredient&q=$query&p=1&format=xml");
 	}
 	
-	
-	/* No Longer Used */
-	public function getIngredientData($ingredient) {
-		$this->ingredientMax++;
-		if($this->ingredientMax > 40 && !isset($this->ingredientData[$ingredient])) return array();
-		if(isset($this->ingredientData[$ingredient])) {
-			return $this->ingredientData[$ingredient];
-		}
-		
-		$arr = preg_split("/[|-\s]+/", $this->API->Search($ingredient)->food->food_description);
-		$arr2 = array();
-		for($i = 2; $i < sizeof($arr); $i += 2) {
-			$arr2[strtolower(str_replace(":","",$arr[$i]))] = $arr[$i+1];
-		}
-		$arr2["amount"] = $arr[1];
-		$this->ingredientData[$ingredient] = $arr2;
-		
-		return $arr2;
-	}
-	
+	/* called right after fetch to process the data. Simultaneously merges the xml sources (fatsecret, recipepuppy) and creates an atom compliant feed */
 	public function processData() {
 		$start = "<feed xmlns='http://www.w3.org/2005/Atom'></feed>";
 		$this->atom = new SimpleXMLElement($start);
@@ -81,37 +62,17 @@ class Controller {
 		$this->atom = $feed;
 	}
 	
-	public function processRecipes() {
-		$recipe = $this->responseXml->recipe;
-		$id = $recipe->recipe_id[0];
-		$recipe_full = $this->API->runQuery("method=recipe.get&recipe_id=$id&format=xml");
-		$ingredients = $recipe->addChild("ingredients");
-		foreach($recipe_full->ingredients->ingredient as $ingredient) {
-			$ingchild = $ingredients->addChild("ingredient");
-			$ingchild->addChild("food_name", $ingredient->food_name[0]);
-			$ingchild->addChild("number_of_units", $ingredient->number_of_units[0]);
-			$ingchild->addChild("measurement_description", $ingredient->measurement_description[0]);
-			$fid = $ingredient->food_id;
-			$food = $this->API->runQuery("method=food.get&food_id=$fid&format=xml");
-			foreach($food->servings->serving as $serving) {
-				if(strcmp($serving->measurement_description[0], $ingredient->measurement_description[0]) == 0) {
-					foreach($serving->children() as $child) {
-						if($child->getName() != "serving_url") $ingchild->addChild($child->getName(), $child[0]);
-						else $ingchild->addChild($child->getName(), urlencode($child[0]));
-					}
-				}
-			}
-		}
-	}
-	
+	/* returns the recipe xml */
 	public function toXML() {
 		return $this->responseXml->asXML();
 	}
 	
+	/* returns the atom */
 	public function toAtom() {
 		return $this->atom->asXML();
 	}
 	
+	/* curl inserts into exist DB */
 	public function insertIntoExist() {
 		$initATOM = '<?xml version="1.0" ?> <feed xmlns="http://www.w3.org/2005/Atom"> <title>'.$this->query.'</title><updated>'.time().'</updated></feed>';
 		

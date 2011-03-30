@@ -7,13 +7,14 @@ try {
 	//$ing = filter_var($_GET["ingredient"], FILTER_SANITIZE_URL);
 	$q = filter_var($_GET["query"], FILTER_SANITIZE_URL);
 	$controller->fetch($q);
-	//$controller->processRecipes();
 	$controller->processData();
 	$xml = $controller->toXML();
 	if($xml == "" || $xml == "User is performing too many actions: please try again later") throw new Exception("ahhh");
 	$controller->insertIntoExist();
 	echo $xml;
-	echo $controller->atom->asXML();
+	
+	// for use later, will echo and parse atom instead of recipe xml
+	//echo $controller->atom->asXML();
 		
 } catch (Exception $e) {
 	header("HTTP/1.0 500 Internal Server Error");
