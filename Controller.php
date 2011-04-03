@@ -18,7 +18,7 @@ class Controller {
 	/* loads in initial recipe data from recipepuppy */
 	public function fetch($query) {
 		$this->query = $query;
-		$this->responseXml = simplexml_load_file("http://www.recipepuppy.com/api/?i=$ingredient&q=$query&p=1&format=xml");
+		$this->responseXml = simplexml_load_file("http://www.recipepuppy.com/api/?&q=$query&p=1&format=xml");
 	}
 	
 	/* apparently this is used */
@@ -59,24 +59,29 @@ class Controller {
 			$ingredients = explode(",", $recipe->ingredients);
 			$recipe->addChild("name", $recipe->title[0]);
 			
-			$desc = "";
-			
 			$ingredientData = $recipe->addChild("ingredientData");
+			$atomingredients = $entry->addChild("ingredientData");
+			$atomingredients->addAttribute("xmlns", "http://ingredientdata.com");
+			
 			foreach($ingredients as $ingredient) {
 				
 				$data = $this->getIngredientData($ingredient);
 				
-				$desc .= str_replace(" ", "", $ingredient)."\n";
 				$ingchild = $ingredientData->addChild("ingredient");
+				$atomingchild = $atomingredients->addChild("ingredient");
+
 				$ingchild->addAttribute("name", str_replace(" ", "", $ingredient));
+				$atomingchild->addAttribute("name", str_replace(" ", "", $ingredient));
+							
 				foreach ($data as $key => $value) {
 				    $ic = $ingchild->addChild("nutrient", $value);
 					$ic->addAttribute("name", $key);
-					$desc .= $key." : ".$value."\n";
+
+					$ic2 = $atomingchild->addChild("nutrient", $value);
+					$ic2->addAttribute("name", $key);
 				}
 				
 			}
-			$entry->addChild("summary", $desc);
 		}
 		$this->atom = $feed;
 	}
